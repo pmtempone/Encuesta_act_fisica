@@ -1,0 +1,92 @@
+---
+title: "Encuesta actividad Fisica"
+author: "pmtempone"
+date: "3 de agosto de 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+load(".RData")
+```
+```{r se cargan librerias,echo=FALSE,include=FALSE}
+library(FactoMineR)
+library(questionr)
+library(amap) #crear la matriz de burt
+library(profileR)
+library(foreign)
+library(psych)
+library(knitr)
+library(xtable)
+suppressPackageStartupMessages(library(dendextend))
+suppressPackageStartupMessages(library(dendextendRcpp))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(ggfortify))
+library(corrplot)
+#library(Stuff)
+suppressPackageStartupMessages(library(dplyr))
+library(broom)
+library(EnQuireR)
+```
+
+## Analisis de datos
+
+Sumario de datos:
+
+
+```{r encuesta_v2,echo=FALSE}
+summary(encuesta_v2)
+
+plot(encuesta_v2$monto,encuesta_v2$edad)
+
+```
+
+Analisis Factorial:
+```{r factor analisis,echo=FALSE}
+factor_ana$eig
+
+dimdesc(factor_ana)
+```
+
+## Visualizaciones
+
+Analisis factorial de correspondencias - Preguntas por separado:
+
+```{r pressure, echo=FALSE}
+plotellipses(factor_ana)
+
+```
+
+
+##Cluster de variables:
+
+Vemos distintos tipos de clusters:
+
+```{r,echo=FALSE}
+d2 = dist(encuesta_matrix_v2,method = "euclidean")
+encuesta.clust.sin = as.dendrogram(hclust(d2, method = "single")) %>% set("branches_lwd", 2)
+encuesta.clust.com = as.dendrogram(hclust(d2, method = "complete")) %>% set("branches_lwd", 2)
+encuesta.clust.avg = as.dendrogram(hclust(d2, method = "average")) %>% set("branches_lwd", 2)
+encuesta.clust.ward = as.dendrogram(hclust(d2, method = "ward.D")) %>% set("branches_lwd", 2)
+encuesta.dend = dendlist("Cercano" = encuesta.clust.sin, "Lejano" = encuesta.clust.com, "Promedio" = encuesta.clust.avg,"Ward"=encuesta.clust.ward)
+
+corrplot(cor.dendlist(encuesta.dend), "pie", "lower")
+```
+
+
+Seleccionamos clusters de vecinos mas cercanos:
+
+```{r,echo=FALSE}
+plot(encuesta.clust.sin %>% set("branches_k_color", k=3) %>% set("branches_lwd", 2), main = "Cercano")
+```
+
+Densidad de los encuesta_v2dos:
+
+```{r,echo=FALSE}
+ENdensity(factor_ana)
+
+```
+```{r,echo=FALSE}
+MCA(encuesta_v2)
+```
+
